@@ -1,26 +1,22 @@
 import React, {useEffect, useState} from "react";
 import AppLayout from "../../layouts/AppLayout";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 function ShowRaces() {
     const [races, setRaces] = useState([]);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const axiosRace = async () => {
             try {
-                const response = await fetch("http://localhost:8888/api/race");
-
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch data. Status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                setRaces(data.Data);
-            } catch (error) {
-                console.error("Error fetching user data:", error);
+                const response = await axios.get("http://localhost:8888/api/race");
+                setRaces(response.data);
+                console.log(response.data);
+            } catch(error) {
+                console.error("Error: ", error)
             }
         }
-        fetchData();
+        axiosRace();
     }, []);
 
     return (
@@ -57,12 +53,12 @@ function ShowRaces() {
                     </thead>
                     <tbody>
                         {races.map((race) => (
-                            <tr key={race.Id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                            <tr key={race.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                 <th className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                    {race.Name}
+                                    {race.name}
                                 </th>
                                 <th className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white underline">
-                                    <Link to={`${race.Name}`} className="hover:text-gray-400">
+                                    <Link to={`${race.name}`} className="hover:text-gray-400">
                                         click
                                     </Link>
                                 </th>

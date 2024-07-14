@@ -1,6 +1,6 @@
 package model
 
 type Race struct {
-	Id   int
-	Name string
+	Id   int    `json:"id" gorm:"primaryKey"`
+	Name string `json:"name"`
 }

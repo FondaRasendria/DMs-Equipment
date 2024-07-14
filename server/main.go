@@ -3,60 +3,27 @@ package main
 import (
 	"fmt"
 	"golang-crud/config"
-	"golang-crud/controller"
-	"golang-crud/helper"
-	"golang-crud/repository"
+	"golang-crud/migration"
 	"golang-crud/router"
-	"golang-crud/service"
-	"net/http"
 
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	_ "github.com/lib/pq"
 )
 
 func main() {
 	fmt.Printf("Start Server")
-	//database
-	db := config.DatabaseConnection()
 
-	//repository
-	raceRepository := repository.NewRaceRepository(db)
-	subraceRepository := repository.NewSubraceRepository(db)
-	traitRepository := repository.NewTraitRepository(db)
-	subtraitRepository := repository.NewSubtraitRepository(db)
-	monsterRepository := repository.NewMonsterRepository(db)
-	monsterTraitRepository := repository.NewMonsterTraitRepositoryImpl(db)
-	actionRepository := repository.NewActionRepository(db)
+	config.DatabaseInit()
+	migration.RunMigration()
+	app := fiber.New()
 
-	//service
-	raceService := service.NewRaceServiceImpl(raceRepository)
-	subraceService := service.NewSubraceServiceImpl(subraceRepository)
-	traitService := service.NewTraitServiceImpl(traitRepository)
-	subtraitService := service.NewSubtraitServiceImpl(subtraitRepository)
-	monsterService := service.NewMonsterServiceImpl(monsterRepository)
-	monsterTraitService := service.NewMonsterTraitServiceImpl(monsterTraitRepository)
-	actionService := service.NewActionServiceImpl(actionRepository)
+	app.Use(cors.New(cors.Config{
+		AllowHeaders: "*",
+		AllowOrigins: "*",
+		AllowMethods: "*",
+	}))
+	router.RouteInit(app)
 
-	//controller
-	raceController := controller.NewRaceController(raceService)
-	subraceController := controller.NewSubraceController(subraceService)
-	traitController := controller.NewTraitController(traitService)
-	subtraitController := controller.NewSubtraitController(subtraitService)
-	monsterController := controller.NewMonsterController(monsterService)
-	monsterTraitController := controller.NewMonsterTraitController(monsterTraitService)
-	actionController := controller.NewActionController(actionService)
-
-	//router
-	routes := router.NewRouter(
-		raceController,
-		subraceController,
-		traitController,
-		subtraitController,
-		monsterController,
-		monsterTraitController,
-		actionController)
-
-	server := http.Server{Addr: "localhost:8888", Handler: routes}
-
-	err := server.ListenAndServe()
-	helper.PanicIfError(err)
+	app.Listen(":8888")
 }

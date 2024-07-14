@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import AppLayout from "../../layouts/AppLayout";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 function ShowMonsters() {
     const [monsters, setMonsters] = useState([]);
@@ -15,22 +16,23 @@ function ShowMonsters() {
                 }
 
                 const data = await response.json();
-                setMonsters(data.Data);
+                setMonsters(data);
+                console.log(data);
 
-                const promises = data.Data.map(async (monster) => {
-                    const traitResponse = await fetch("http://localhost:8888/api/monstertrait/parent/" + monster.Id);
+                const promises = data.map(async (monster) => {
+                    const traitResponse = await fetch("http://localhost:8888/api/monstertrait/parentid/" + monster.id);
                     if(!traitResponse.ok) {
-                        throw new Error(`Failed to fetch monstertraits for trait ${monster.Id}. Status: ${traitResponse.Status}`);
+                        throw new Error(`Failed to fetch monstertraits for trait ${monster.id}. Status: Error`);
                     }
                     const traitData = await traitResponse.json();
 
-                    const actionResponse = await fetch("http://localhost:8888/api/action/parent/" + monster.Id);
+                    const actionResponse = await fetch("http://localhost:8888/api/action/parentid/" + monster.id);
                     if(!actionResponse.ok) {
-                        throw new Error(`Failed to fetch monstertraits for trait ${monster.Id}. Status: ${actionResponse.Status}`);
+                        throw new Error(`Failed to fetch monstertraits for trait ${monster.id}. Status: Error`);
                     }
                     const actionData = await actionResponse.json();
 
-                    return {...monster, traits: traitData.Data, actions: actionData.Data}
+                    return {...monster, traits: traitData.data, actions: actionData.data}
                 });
 
                 const updatedMonster = await Promise.all(promises);
@@ -89,58 +91,58 @@ function ShowMonsters() {
             </button>
             
             {monsters.map((monster) => (
-                <div key={monster.Id} className="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-                    <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{monster.Name}</h5>
-                    <h6 className="text-sm mb-2 font-light tracking-tight text-gray-900 dark:text-white italic">{monster.Type}, <span>{monster.Alignment}</span></h6>
+                <div key={monster.id} className="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                    <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{monster.name}</h5>
+                    <h6 className="text-sm mb-2 font-light tracking-tight text-gray-900 dark:text-white italic">{monster.type}, <span>{monster.alignment}</span></h6>
                     <hr className="h-1 bg-red-700 border-0"></hr>
-                    <p className="font-medium text-gray-700 dark:text-white">Armor Class: <span className="font-light">{monster.AC}</span></p>
-                    <p className="font-medium text-gray-700 dark:text-white">HP: <span className="font-light">{monster.FixedHP} <span>({monster.DiceHP})</span></span></p>
-                    <p className="mb-1 font-medium text-gray-700 dark:text-white">Speed: <span className="font-light">{monster.Speed}</span></p>
+                    <p className="font-medium text-gray-700 dark:text-white">Armor Class: <span className="font-light">{monster.ac}</span></p>
+                    <p className="font-medium text-gray-700 dark:text-white">HP: <span className="font-light">{monster.fixed_hp} <span>({monster.dice_hp})</span></span></p>
+                    <p className="mb-1 font-medium text-gray-700 dark:text-white">Speed: <span className="font-light">{monster.speed}</span></p>
                     <hr className="mb-1 h-1 bg-red-700 border-0"></hr>
-                    <p className="font-medium text-gray-700 dark:text-white">STR: <span className="font-light">{monster.STR} ({abilityTable(monster.STR)})</span></p>
-                    <p className="font-medium text-gray-700 dark:text-white">DEX: <span className="font-light">{monster.DEX} ({abilityTable(monster.DEX)})</span></p>
-                    <p className="font-medium text-gray-700 dark:text-white">CON: <span className="font-light">{monster.CON} ({abilityTable(monster.CON)})</span></p>
-                    <p className="font-medium text-gray-700 dark:text-white">INT: <span className="font-light">{monster.INT} ({abilityTable(monster.INT)})</span></p>
-                    <p className="font-medium text-gray-700 dark:text-white">WIS: <span className="font-light">{monster.WIS} ({abilityTable(monster.WIS)})</span></p>
-                    <p className="mb-1 font-medium text-gray-700 dark:text-white">CHA: <span className="font-light">{monster.CHA} ({abilityTable(monster.CHA)})</span></p>
+                    <p className="font-medium text-gray-700 dark:text-white">STR: <span className="font-light">{monster.str} ({abilityTable(monster.str)})</span></p>
+                    <p className="font-medium text-gray-700 dark:text-white">DEX: <span className="font-light">{monster.dex} ({abilityTable(monster.dex)})</span></p>
+                    <p className="font-medium text-gray-700 dark:text-white">CON: <span className="font-light">{monster.con} ({abilityTable(monster.con)})</span></p>
+                    <p className="font-medium text-gray-700 dark:text-white">INT: <span className="font-light">{monster.int} ({abilityTable(monster.int)})</span></p>
+                    <p className="font-medium text-gray-700 dark:text-white">WIS: <span className="font-light">{monster.wis} ({abilityTable(monster.wis)})</span></p>
+                    <p className="mb-1 font-medium text-gray-700 dark:text-white">CHA: <span className="font-light">{monster.cha} ({abilityTable(monster.cha)})</span></p>
                     <hr className="mb-1 h-1 bg-red-700 border-0"></hr>
                     
-                    {monster.SavingThrows && (
-                        <p className="font-medium text-gray-700 dark:text-white">Saving Throws: <span className="font-light">{monster.SavingThrows}</span></p>
+                    {monster.saving_throws && (
+                        <p className="font-medium text-gray-700 dark:text-white">Saving Throws: <span className="font-light">{monster.saving_throws}</span></p>
                     )}
-                    {monster.Skills && (
-                        <p className="font-medium text-gray-700 dark:text-white">Skills: <span className="font-light">{monster.Skills}</span></p>
+                    {monster.skills && (
+                        <p className="font-medium text-gray-700 dark:text-white">Skills: <span className="font-light">{monster.skills}</span></p>
                     )}
-                    {monster.DamageImmunities && (
-                        <p className="font-medium text-gray-700 dark:text-white">Damage Immunities: <span className="font-light">{monster.DamageImmunities}</span></p>
+                    {monster.damage_immunities && (
+                        <p className="font-medium text-gray-700 dark:text-white">Damage Immunities: <span className="font-light">{monster.damage_immunities}</span></p>
                     )}
-                    {monster.DamageVulnerabilities && (
-                        <p className="font-medium text-gray-700 dark:text-white">Damage Vulnerabilities: <span className="font-light">{monster.DamageVulnerabilities}</span></p>
+                    {monster.damage_vulnerabilities && (
+                        <p className="font-medium text-gray-700 dark:text-white">Damage Vulnerabilities: <span className="font-light">{monster.damage_vulnerabilities}</span></p>
                     )}
-                    {monster.DamageResistences && (
-                        <p className="font-medium text-gray-700 dark:text-white">Damage Resistences: <span className="font-light">{monster.DamageResistences}</span></p>
+                    {monster.damage_resistences && (
+                        <p className="font-medium text-gray-700 dark:text-white">Damage Resistences: <span className="font-light">{monster.damage_resistences}</span></p>
                     )}
-                    {monster.ConditionImmunities && (
-                        <p className="font-medium text-gray-700 dark:text-white">Condition Immunities: <span className="font-light">{monster.ConditionImmunities}</span></p>
+                    {monster.condition_immunities && (
+                        <p className="font-medium text-gray-700 dark:text-white">Condition Immunities: <span className="font-light">{monster.condition_immunities}</span></p>
                     )}
-                    {monster.Senses && (
-                        <p className="font-medium text-gray-700 dark:text-white">Senses: <span className="font-light">{monster.Senses}</span></p>
+                    {monster.senses && (
+                        <p className="font-medium text-gray-700 dark:text-white">Senses: <span className="font-light">{monster.senses}</span></p>
                     )}
-                    {monster.Language && (
-                        <p className="font-medium text-gray-700 dark:text-white">Language: <span className="font-light">{monster.Language}</span></p>
+                    {monster.language && (
+                        <p className="font-medium text-gray-700 dark:text-white">Language: <span className="font-light">{monster.language}</span></p>
                     )}
-                    {monster.CR && (
-                        <p className="font-medium text-gray-700 dark:text-white">Challenge: <span className="font-light">{monster.CR}</span></p>
+                    {monster.cr && (
+                        <p className="font-medium text-gray-700 dark:text-white">Challenge: <span className="font-light">{monster.cr}</span></p>
                     )}
 
                     <hr className="mb-1 h-1 bg-red-700 border-0"></hr>
                     {monster.traits && monster.traits.map((trait) => (
-                        <p key={trait.Id} className="font-medium text-gray-700 dark:text-white">&#x2022; {trait.Name}, <span className="font-light">{trait.Description}</span></p>
+                        <p key={trait.id} className="font-medium text-gray-700 dark:text-white">&#x2022; {trait.name}, <span className="font-light">{trait.description}</span></p>
                     ))}
                     <hr className="mb-1 h-1 bg-red-700 border-0"></hr>
                     <p className="text-lg font-medium text-gray-700 dark:text-white">Action</p>
                     {monster.actions && monster.actions.map((action) => (
-                        <p key={action.Id} className="font-medium text-gray-700 dark:text-white">&#x2022; {action.Name}, <span className="font-light">{action.Description}</span></p>
+                        <p key={action.id} className="font-medium text-gray-700 dark:text-white">&#x2022; {action.name}, <span className="font-light">{action.description}</span></p>
                     ))}
                 </div>
             ))}

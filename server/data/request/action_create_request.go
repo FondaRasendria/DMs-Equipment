@@ -1,7 +1,7 @@
 package request
 
 type ActionCreateRequest struct {
-	ParentId    int    "validate: 'required' json: 'parentid'"
-	Name        string "validate: 'required' json: 'name'"
-	Description string "validate: 'required' json: 'description'"
+	ParentId    int    `json:"parent_id" validate:"required"`
+	Name        string `json:"name" validate:"required"`
+	Description string `json:"description" validate:"required"`
 }
