@@ -19,4 +19,7 @@ func RunMigration() {
 	config.DB.AutoMigrate(&model.Language{})
 	config.DB.AutoMigrate(&model.SavingThrow{})
 	config.DB.AutoMigrate(&model.SkillType{})
+
+	config.DB.AutoMigrate(&model.Background{})
+	config.DB.AutoMigrate(&model.Spell{})
 }
