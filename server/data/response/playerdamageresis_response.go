@@ -1,0 +1,7 @@
+package response
+
+type PlayerDamageResisResponse struct {
+	Id       int `json:"id"`
+	PlayerId int `json:"player_id"`
+	DamageId int `json:"damage_id"`
+}
